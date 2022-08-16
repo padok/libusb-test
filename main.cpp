@@ -51,13 +51,20 @@ int main(int argc, char *argv[])
         struct libusb_device_descriptor desc;
         libusb_get_device_descriptor(device, &desc);
         cout << "idVendor " << desc.idVendor << " idProduct " << desc.idProduct << endl;
+        cout << "bDeviceProtocol " << (unsigned int)desc.bDeviceProtocol << endl;
+
         int bus_nur = libusb_get_bus_number(device);
         cout << "libusb_get_bus_number " << bus_nur << endl;
         cout << "libusb_get_device_speed " << libusb_get_device_speed(device) << endl;
+
         int device_address = libusb_get_device_address(device);
         cout << "libusb_get_device_address " << device_address << endl;
+
+        int port_number = libusb_get_port_number(device);
+        cout << "libusb_get_port_number " << port_number << endl;
+
         uint8_t port_numbers_byte[8];
-        memset(port_numbers_byte, 0, 8);
+        memset(port_numbers_byte, 0, sizeof(port_numbers_byte));
         unsigned int port_numbers[8];
         int port_numbers_ret = libusb_get_port_numbers(device, port_numbers_byte, sizeof(port_numbers_byte));
         for (int i = 0; i < sizeof(port_numbers_byte); i++)
