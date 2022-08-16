@@ -1,10 +1,26 @@
 #include <stdio.h>
 #include <libusb.h>
 #include <iostream>
+#include <cstring>
+
 using namespace std;
 
 #define ERROR 1
 #define SUCCESS 0
+
+template <typename Type, int Size>
+void print_array(Type const (&array)[Size])
+{
+    std::cout << "[";
+    for (int i = 0; i < Size; i++)
+    {
+        if (i)
+            std::cout << " ," << array[i];
+        else
+            std::cout << array[i];
+    }
+    std::cout << "]" << std::endl;
+}
 
 int main(int argc, char *argv[])
 {
@@ -30,6 +46,7 @@ int main(int argc, char *argv[])
     int i;
     for (i = 0; i < num_devs; i++)
     {
+        cout << "------------------" << endl;
         struct libusb_device *device = dev_list[i];
         struct libusb_device_descriptor desc;
         libusb_get_device_descriptor(device, &desc);
@@ -37,6 +54,20 @@ int main(int argc, char *argv[])
         int bus_nur = libusb_get_bus_number(device);
         cout << "libusb_get_bus_number " << bus_nur << endl;
         cout << "libusb_get_device_speed " << libusb_get_device_speed(device) << endl;
+        int device_address = libusb_get_device_address(device);
+        cout << "libusb_get_device_address " << device_address << endl;
+        uint8_t port_numbers_byte[8];
+        memset(port_numbers_byte, 0, 8);
+        unsigned int port_numbers[8];
+        int port_numbers_ret = libusb_get_port_numbers(device, port_numbers_byte, sizeof(port_numbers_byte));
+        for (int i = 0; i < sizeof(port_numbers_byte); i++)
+        {
+            port_numbers[i] = port_numbers_byte[i];
+        }
+        std::memcpy(port_numbers, port_numbers_byte, sizeof(port_numbers_byte));
+        cout << "libusb_get_port_numbers ";
+        print_array(port_numbers);
+        cout << endl;
     }
 
     libusb_free_device_list(dev_list, 1);

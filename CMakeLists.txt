@@ -10,7 +10,7 @@ add_executable(main main.cpp)
 if(APPLE) # macOS
     FIND_PATH(
         LIBUSB_INCLUDE_DIR NAMES libusb.h
-        HINTS /usr /usr/local /opt
+        HINTS /usr /usr/local /opt ()
         PATH_SUFFIXES libusb-1.0
     )
     set(LIBUSB_NAME libusb-1.0.dylib)
@@ -22,6 +22,21 @@ if(APPLE) # macOS
     if(NOT LIBUSB_NAME)
         message(FATAL_ERROR "No libusb library found on your system! Install libusb-1.0 from Homebrew or MacPorts")
     endif()
+else ()
+    FIND_PATH(
+        LIBUSB_INCLUDE_DIR NAMES libusb.h
+        HINTS /usr /usr/local /opt
+        PATH_SUFFIXES libusb-1.0
+        )
+    set(LIBUSB_NAME usb-1.0)
+    find_library(
+        LIBUSB_LIBRARY NAMES ${LIBUSB_NAME}
+        HINTS /usr /usr/local /opt
+        )
+
+    if (NOT LIBUSB_NAME)
+        message(FATAL_ERROR "libusb library not found on your system! Install libusb 1.0.x from your package repository.")
+    endif ()
 endif()
 
 include_directories(${LIBUSB_INCLUDE_DIR})
